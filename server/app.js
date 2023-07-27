@@ -28,7 +28,19 @@ app.enable('trust proxy');
 
 app.post('/api/fetchStockData', (req, res) => {
     // YOUR CODE GOES HERE, PLEASE DO NOT EDIT ANYTHING OUTSIDE THIS FUNCTION
-    res.sendStatus(200);
+    const { symbol, date } = req.body;
+    const apiKey = process.env.API_KEY;
+    const apiUrl = `https://api.polygon.io/v1/open-close/${symbol}/${date}?adjusted=true&apiKey=${apiKey}`;
+    axios.get(apiUrl).then(response => {
+        const { open, high, low, close, volume } = response.data;
+
+        res.status(200).json({open, high, low, close, volume});
+    }).
+    catch(error => {
+        console.error('Error fetching data:', error);
+        res.status(400).json({error: 'Error fetching data'});
+    })
+    //res.sendStatus(200);
 });
 
 const port = process.env.PORT || 5000;
